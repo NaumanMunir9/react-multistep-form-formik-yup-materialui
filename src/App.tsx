@@ -1,6 +1,6 @@
-import React, { FC } from "react";
-import { Card, CardContent } from "@material-ui/core";
-import { Field, Form, Formik } from "formik";
+import React, { FC, useState } from "react";
+import { Button, Card, CardContent } from "@material-ui/core";
+import { Field, Form, Formik, FormikConfig, FormikValues } from "formik";
 import { TextField, CheckboxWithLabel } from "formik-material-ui";
 import { object, mixed, number } from "yup";
 
@@ -26,48 +26,79 @@ export const App: FC = () => {
   return (
     <Card>
       <CardContent>
-        <Formik
+        <FormikStepper
           validationSchema={validationSchemaYup}
           initialValues={initialValueFormik}
           onSubmit={() => {}}
         >
-          <Form autoComplete="off">
-            <div>
-              <Field
-                name="firstName"
-                component={TextField}
-                label="First Name"
-              />
-              <Field name="lastName" component={TextField} label="Last Name" />
-              <Field
-                name="millionaire"
-                type="checkbox"
-                component={CheckboxWithLabel}
-                Label={{ label: "I am a Millionaire" }}
-              />
-            </div>
+          <div>
+            <Field name="firstName" component={TextField} label="First Name" />
+            <Field name="lastName" component={TextField} label="Last Name" />
+            <Field
+              name="millionaire"
+              type="checkbox"
+              component={CheckboxWithLabel}
+              Label={{ label: "I am a Millionaire" }}
+            />
+          </div>
 
-            <div>
-              <Field
-                name="netWorth"
-                type="number"
-                component={TextField}
-                label="Net Worth"
-              />
-            </div>
+          <div>
+            <Field
+              name="netWorth"
+              type="number"
+              component={TextField}
+              label="Net Worth"
+            />
+          </div>
 
-            <div>
-              <Field
-                name="description"
-                component={TextField}
-                label="Description"
-              />
-            </div>
-          </Form>
-        </Formik>
+          <div>
+            <Field
+              name="description"
+              component={TextField}
+              label="Description"
+            />
+          </div>
+        </FormikStepper>
       </CardContent>
     </Card>
   );
 };
 
-export const FormikStepper = () => {};
+export const FormikStepper = ({
+  children,
+  ...props
+}: FormikConfig<FormikValues>) => {
+  const [step, setStep] = useState(0);
+
+  const childrenArray = React.Children.toArray(children);
+  const currentChild = childrenArray[step];
+
+  const isLastStep = () => {
+    return step === childrenArray.length - 1;
+  };
+
+  return (
+    <Formik
+      {...props}
+      onSubmit={async (values, helpers) => {
+        if (isLastStep()) {
+          await props.onSubmit(values, helpers);
+        } else {
+          setStep((currentStep) => currentStep + 1);
+        }
+      }}
+    >
+      <Form autoComplete="off">
+        {currentChild}
+
+        {step > 0 ? (
+          <Button onClick={() => setStep((currentStep) => currentStep - 1)}>
+            Back
+          </Button>
+        ) : null}
+
+        <Button type="submit">{isLastStep() ? "Submit" : "Next"}</Button>
+      </Form>
+    </Formik>
+  );
+};
