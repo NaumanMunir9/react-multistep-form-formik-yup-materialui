@@ -26,12 +26,8 @@ export const App: FC = () => {
   return (
     <Card>
       <CardContent>
-        <FormikStepper
-          validationSchema={validationSchemaYup}
-          initialValues={initialValueFormik}
-          onSubmit={() => {}}
-        >
-          <div>
+        <FormikStepper initialValues={initialValueFormik} onSubmit={() => {}}>
+          <FormikStep>
             <Field name="firstName" component={TextField} label="First Name" />
             <Field name="lastName" component={TextField} label="Last Name" />
             <Field
@@ -40,38 +36,53 @@ export const App: FC = () => {
               component={CheckboxWithLabel}
               Label={{ label: "I am a Millionaire" }}
             />
-          </div>
+          </FormikStep>
 
-          <div>
+          <FormikStep validationSchema={validationSchemaYup}>
             <Field
               name="netWorth"
               type="number"
               component={TextField}
               label="Net Worth"
             />
-          </div>
+          </FormikStep>
 
-          <div>
+          <FormikStep>
             <Field
               name="description"
               component={TextField}
               label="Description"
             />
-          </div>
+          </FormikStep>
         </FormikStepper>
       </CardContent>
     </Card>
   );
 };
 
+// ----------------------------------------------
+// Formik step Function
+export interface FormikStepProps
+  extends Pick<FormikConfig<FormikValues>, "children" | "validationSchema"> {}
+
+export const FormikStep = ({ children }: FormikStepProps) => {
+  return <>{children}</>;
+};
+
+// ----------------------------------------------
+// Formik Stepper Function
 export const FormikStepper = ({
   children,
   ...props
 }: FormikConfig<FormikValues>) => {
   const [step, setStep] = useState(0);
 
-  const childrenArray = React.Children.toArray(children);
+  const childrenArray = React.Children.toArray(
+    children
+  ) as React.ReactElement<FormikStepProps>[];
+
   const currentChild = childrenArray[step];
+  console.log("children", currentChild);
 
   const isLastStep = () => {
     return step === childrenArray.length - 1;
