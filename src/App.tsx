@@ -22,7 +22,7 @@ const validationSchemaYup = object().shape({
   }),
 });
 
-const App: FC = () => {
+export const App: FC = () => {
   return (
     <Card>
       <CardContent>
@@ -32,25 +32,37 @@ const App: FC = () => {
           onSubmit={() => {}}
         >
           <Form autoComplete="off">
-            <Field name="firstName" component={TextField} label="First Name" />
-            <Field name="lastName" component={TextField} label="Last Name" />
-            <Field
-              name="millionaire"
-              type="checkbox"
-              component={CheckboxWithLabel}
-              Label={{ label: "I am a Millionaire" }}
-            />
-            <Field
-              name="netWorth"
-              type="number"
-              component={TextField}
-              label="Net Worth"
-            />
-            <Field
-              name="description"
-              component={TextField}
-              label="Description"
-            />
+            <div>
+              <Field
+                name="firstName"
+                component={TextField}
+                label="First Name"
+              />
+              <Field name="lastName" component={TextField} label="Last Name" />
+              <Field
+                name="millionaire"
+                type="checkbox"
+                component={CheckboxWithLabel}
+                Label={{ label: "I am a Millionaire" }}
+              />
+            </div>
+
+            <div>
+              <Field
+                name="netWorth"
+                type="number"
+                component={TextField}
+                label="Net Worth"
+              />
+            </div>
+
+            <div>
+              <Field
+                name="description"
+                component={TextField}
+                label="Description"
+              />
+            </div>
           </Form>
         </Formik>
       </CardContent>
@@ -58,4 +70,4 @@ const App: FC = () => {
   );
 };
 
-export default App;
+export const FormikStepper = () => {};
