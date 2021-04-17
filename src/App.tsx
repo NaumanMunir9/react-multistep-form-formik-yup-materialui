@@ -1,26 +1,46 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { Card, CardContent } from "@material-ui/core";
+import { Field, Form, Formik } from "formik";
+import { TextField, CheckboxWithLabel } from "formik-material-ui";
+import React from "react";
 
-function App() {
+const initialValueFormik = {
+  firstName: "",
+  lastName: "",
+  millionaire: false,
+  netWorth: 0,
+  description: "",
+};
+
+const App = () => {
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
+    <Card>
+      <CardContent>
+        <Formik initialValues={initialValueFormik} onSubmit={() => {}}>
+          <Form>
+            <Field name="firstName" component={TextField} label="First Name" />
+            <Field name="lastName" component={TextField} label="Last Name" />
+            <Field
+              name="millionaire"
+              type="checkbox"
+              component={CheckboxWithLabel}
+              Label={{ label: "I am a Millionaire" }}
+            />
+            <Field
+              name="netWorth"
+              type="number"
+              component={TextField}
+              label="Net Worth"
+            />
+            <Field
+              name="description"
+              component={TextField}
+              label="Description"
+            />
+          </Form>
+        </Formik>
+      </CardContent>
+    </Card>
   );
-}
+};
 
 export default App;
