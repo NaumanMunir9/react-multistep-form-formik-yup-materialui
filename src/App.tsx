@@ -1,8 +1,18 @@
 import React, { FC, useState } from "react";
-import { Button, Card, CardContent } from "@material-ui/core";
+import {
+  Box,
+  Button,
+  Card,
+  CardContent,
+  Container,
+  Step,
+  StepLabel,
+  Stepper,
+} from "@material-ui/core";
 import { Field, Form, Formik, FormikConfig, FormikValues } from "formik";
 import { TextField, CheckboxWithLabel } from "formik-material-ui";
 import { object, mixed, number } from "yup";
+import ButtonAppBar from "./components/ButtonAppBar";
 
 const initialValueFormik = {
   firstName: "",
@@ -24,46 +34,81 @@ const validationSchemaYup = object().shape({
 
 export const App: FC = () => {
   return (
-    <Card>
-      <CardContent>
-        <FormikStepper initialValues={initialValueFormik} onSubmit={() => {}}>
-          <FormikStep>
-            <Field name="firstName" component={TextField} label="First Name" />
-            <Field name="lastName" component={TextField} label="Last Name" />
-            <Field
-              name="millionaire"
-              type="checkbox"
-              component={CheckboxWithLabel}
-              Label={{ label: "I am a Millionaire" }}
-            />
-          </FormikStep>
+    <div>
+      <ButtonAppBar />
+      <Container>
+        <Card>
+          <CardContent>
+            <FormikStepper
+              initialValues={initialValueFormik}
+              onSubmit={() => {}}
+            >
+              <FormikStep label="Personal Data">
+                <Box paddingBottom={2}>
+                  <Field
+                    name="firstName"
+                    component={TextField}
+                    label="First Name"
+                    fullWidth
+                  />
+                </Box>
+                <Box paddingBottom={2}>
+                  <Field
+                    name="lastName"
+                    component={TextField}
+                    label="Last Name"
+                    fullWidth
+                  />
+                </Box>
+                <Box paddingBottom={2}>
+                  <Field
+                    name="millionaire"
+                    type="checkbox"
+                    component={CheckboxWithLabel}
+                    Label={{ label: "I am a Millionaire" }}
+                  />
+                </Box>
+              </FormikStep>
 
-          <FormikStep validationSchema={validationSchemaYup}>
-            <Field
-              name="netWorth"
-              type="number"
-              component={TextField}
-              label="Net Worth"
-            />
-          </FormikStep>
+              <FormikStep
+                validationSchema={validationSchemaYup}
+                label="Bank Accounts"
+              >
+                <Box paddingBottom={2}>
+                  <Field
+                    name="netWorth"
+                    type="number"
+                    component={TextField}
+                    label="Net Worth"
+                    fullWidth
+                  />
+                </Box>
+              </FormikStep>
 
-          <FormikStep>
-            <Field
-              name="description"
-              component={TextField}
-              label="Description"
-            />
-          </FormikStep>
-        </FormikStepper>
-      </CardContent>
-    </Card>
+              <FormikStep label="More Info">
+                <Box paddingBottom={2}>
+                  <Field
+                    name="description"
+                    component={TextField}
+                    label="Description"
+                    fullWidth
+                  />
+                </Box>
+              </FormikStep>
+            </FormikStepper>
+          </CardContent>
+        </Card>
+      </Container>
+    </div>
   );
 };
 
 // ----------------------------------------------
 // Formik step Function
 export interface FormikStepProps
-  extends Pick<FormikConfig<FormikValues>, "children" | "validationSchema"> {}
+  extends Pick<FormikConfig<FormikValues>, "children" | "validationSchema"> {
+  label: string;
+}
 
 export const FormikStep = ({ children }: FormikStepProps) => {
   return <>{children}</>;
@@ -100,15 +145,29 @@ export const FormikStepper = ({
       }}
     >
       <Form autoComplete="off">
+        <Stepper alternativeLabel activeStep={step}>
+          {childrenArray.map((child) => (
+            <Step key={child.props.label}>
+              <StepLabel>{child.props.label}</StepLabel>
+            </Step>
+          ))}
+        </Stepper>
+
         {currentChild}
 
         {step > 0 ? (
-          <Button onClick={() => setStep((currentStep) => currentStep - 1)}>
+          <Button
+            onClick={() => setStep((currentStep) => currentStep - 1)}
+            color="primary"
+            variant="contained"
+          >
             Back
           </Button>
         ) : null}
 
-        <Button type="submit">{isLastStep() ? "Submit" : "Next"}</Button>
+        <Button type="submit" color="primary" variant="contained">
+          {isLastStep() ? "Submit" : "Next"}
+        </Button>
       </Form>
     </Formik>
   );
