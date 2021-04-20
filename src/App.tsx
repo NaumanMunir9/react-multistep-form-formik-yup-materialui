@@ -4,6 +4,7 @@ import {
   Button,
   Card,
   CardContent,
+  CircularProgress,
   Container,
   Grid,
   Step,
@@ -127,6 +128,7 @@ export const FormikStepper = ({
   ...props
 }: FormikConfig<FormikValues>) => {
   const [step, setStep] = useState(0);
+  const [completed, setCompleted] = useState(false);
 
   const childrenArray = React.Children.toArray(
     children
@@ -145,6 +147,9 @@ export const FormikStepper = ({
       onSubmit={async (values, helpers) => {
         if (isLastStep()) {
           await props.onSubmit(values, helpers);
+          setCompleted(true);
+          helpers.resetForm();
+          setStep(0);
         } else {
           setStep((currentStep) => currentStep + 1);
         }
@@ -178,6 +183,9 @@ export const FormikStepper = ({
 
             <Grid item>
               <Button
+                startIcon={
+                  isSubmitting ? <CircularProgress size="1rem" /> : null
+                }
                 disabled={isSubmitting}
                 type="submit"
                 color="primary"
