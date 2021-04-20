@@ -5,6 +5,7 @@ import {
   Card,
   CardContent,
   Container,
+  Grid,
   Step,
   StepLabel,
   Stepper,
@@ -32,6 +33,8 @@ const validationSchemaYup = object().shape({
   }),
 });
 
+const sleep = (time: number) => new Promise((acc) => setTimeout(acc, time));
+
 export const App: FC = () => {
   return (
     <div>
@@ -41,7 +44,10 @@ export const App: FC = () => {
           <CardContent>
             <FormikStepper
               initialValues={initialValueFormik}
-              onSubmit={() => {}}
+              onSubmit={async (values) => {
+                await sleep(3000);
+                console.log(values);
+              }}
             >
               <FormikStep label="Personal Data">
                 <Box paddingBottom={2}>
@@ -144,31 +150,45 @@ export const FormikStepper = ({
         }
       }}
     >
-      <Form autoComplete="off">
-        <Stepper alternativeLabel activeStep={step}>
-          {childrenArray.map((child) => (
-            <Step key={child.props.label}>
-              <StepLabel>{child.props.label}</StepLabel>
-            </Step>
-          ))}
-        </Stepper>
+      {({ isSubmitting }) => (
+        <Form autoComplete="off">
+          <Stepper alternativeLabel activeStep={step}>
+            {childrenArray.map((child) => (
+              <Step key={child.props.label}>
+                <StepLabel>{child.props.label}</StepLabel>
+              </Step>
+            ))}
+          </Stepper>
 
-        {currentChild}
+          {currentChild}
 
-        {step > 0 ? (
-          <Button
-            onClick={() => setStep((currentStep) => currentStep - 1)}
-            color="primary"
-            variant="contained"
-          >
-            Back
-          </Button>
-        ) : null}
+          <Grid container spacing={2}>
+            {step > 0 ? (
+              <Grid item>
+                <Button
+                  disabled={isSubmitting}
+                  onClick={() => setStep((currentStep) => currentStep - 1)}
+                  color="primary"
+                  variant="contained"
+                >
+                  Back
+                </Button>
+              </Grid>
+            ) : null}
 
-        <Button type="submit" color="primary" variant="contained">
-          {isLastStep() ? "Submit" : "Next"}
-        </Button>
-      </Form>
+            <Grid item>
+              <Button
+                disabled={isSubmitting}
+                type="submit"
+                color="primary"
+                variant="contained"
+              >
+                {isSubmitting ? "Submitting" : isLastStep() ? "Submit" : "Next"}
+              </Button>
+            </Grid>
+          </Grid>
+        </Form>
+      )}
     </Formik>
   );
 };
