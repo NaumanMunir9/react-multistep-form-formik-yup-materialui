@@ -1,45 +1,22 @@
 // libraries
-import React, { FC, useState } from "react";
-import {
-  Box,
-  Button,
-  Card,
-  CardContent,
-  CircularProgress,
-  Container,
-  Grid,
-  Step,
-  StepLabel,
-  Stepper,
-} from "@material-ui/core";
-import { Field, Form, Formik, FormikConfig, FormikValues } from "formik";
+import React from "react";
+import { Box, Card, CardContent, Container } from "@material-ui/core";
+import { Field } from "formik";
 import { TextField, CheckboxWithLabel } from "formik-material-ui";
-import { object, mixed, number } from "yup";
 
 // components
 import ButtonAppBar from "./components/ButtonAppBar";
-
-const INITIAL_FORM_STATE = {
-  firstName: "",
-  lastName: "",
-  millionaire: false,
-  netWorth: 0,
-  description: "",
-};
-
-const FORM_VALIDATION = object().shape({
-  netWorth: mixed().when("millionaire", {
-    is: true,
-    then: number()
-      .required()
-      .min(1000000, "You need to have a net worth of atleast 1 million"),
-    otherwise: number().required(),
-  }),
-});
+import { INITIAL_FORM_STATE } from "./components/FormInitialState";
+import {
+  NAME_VALIDATION,
+  NET_WORTH_VALIDATION,
+} from "./components/FormValidation";
+import { FormikStepper } from "./components/FormikStepper";
+import { FormikStep } from "./components/FormikStep";
 
 const sleep = (time: number) => new Promise((acc) => setTimeout(acc, time));
 
-export const App: FC = () => {
+export const App: React.FC = () => {
   return (
     <div>
       <ButtonAppBar />
@@ -53,7 +30,10 @@ export const App: FC = () => {
                 console.log(values);
               }}
             >
-              <FormikStep label="Personal Data">
+              <FormikStep
+                label="Personal Data"
+                validationSchema={NAME_VALIDATION}
+              >
                 <Box paddingBottom={2}>
                   <Field
                     name="firstName"
@@ -81,7 +61,7 @@ export const App: FC = () => {
               </FormikStep>
 
               <FormikStep
-                validationSchema={FORM_VALIDATION}
+                validationSchema={NET_WORTH_VALIDATION}
                 label="Bank Accounts"
               >
                 <Box paddingBottom={2}>
@@ -110,99 +90,5 @@ export const App: FC = () => {
         </Card>
       </Container>
     </div>
-  );
-};
-
-// ----------------------------------------------
-// Formik step Function
-export interface FormikStepProps
-  extends Pick<FormikConfig<FormikValues>, "children" | "validationSchema"> {
-  label: string;
-}
-
-export const FormikStep = ({ children }: FormikStepProps) => {
-  return <>{children}</>;
-};
-
-// ----------------------------------------------
-// Formik Stepper Function
-export const FormikStepper = ({
-  children,
-  ...props
-}: FormikConfig<FormikValues>) => {
-  const [step, setStep] = useState(0);
-  const [completed, setCompleted] = useState(false);
-
-  const childrenArray = React.Children.toArray(
-    children
-  ) as React.ReactElement<FormikStepProps>[];
-
-  const currentChild = childrenArray[step];
-
-  const isLastStep = () => {
-    return step === childrenArray.length - 1;
-  };
-
-  return (
-    <Formik
-      {...props}
-      validationSchema={currentChild.props.validationSchema}
-      onSubmit={async (values, helpers) => {
-        if (isLastStep()) {
-          await props.onSubmit(values, helpers);
-          setCompleted(true);
-          helpers.resetForm();
-          setStep(0);
-        } else {
-          setStep((currentStep) => currentStep + 1);
-        }
-      }}
-    >
-      {({ isSubmitting }) => (
-        <Form autoComplete="off">
-          <Stepper alternativeLabel activeStep={step}>
-            {childrenArray.map((child, index) => (
-              <Step
-                key={child.props.label}
-                completed={step > index || completed}
-              >
-                <StepLabel>{child.props.label}</StepLabel>
-              </Step>
-            ))}
-          </Stepper>
-
-          {currentChild}
-
-          <Grid container spacing={2}>
-            {step > 0 ? (
-              <Grid item>
-                <Button
-                  disabled={isSubmitting}
-                  onClick={() => setStep((currentStep) => currentStep - 1)}
-                  color="primary"
-                  variant="contained"
-                >
-                  Back
-                </Button>
-              </Grid>
-            ) : null}
-
-            <Grid item>
-              <Button
-                startIcon={
-                  isSubmitting ? <CircularProgress size="1rem" /> : null
-                }
-                disabled={isSubmitting}
-                type="submit"
-                color="primary"
-                variant="contained"
-              >
-                {isSubmitting ? "Submitting" : isLastStep() ? "Submit" : "Next"}
-              </Button>
-            </Grid>
-          </Grid>
-        </Form>
-      )}
-    </Formik>
   );
 };
