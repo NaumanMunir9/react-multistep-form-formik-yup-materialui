@@ -1,3 +1,4 @@
+// libraries
 import React, { FC, useState } from "react";
 import {
   Box,
@@ -14,9 +15,11 @@ import {
 import { Field, Form, Formik, FormikConfig, FormikValues } from "formik";
 import { TextField, CheckboxWithLabel } from "formik-material-ui";
 import { object, mixed, number } from "yup";
+
+// components
 import ButtonAppBar from "./components/ButtonAppBar";
 
-const initialValueFormik = {
+const INITIAL_FORM_STATE = {
   firstName: "",
   lastName: "",
   millionaire: false,
@@ -24,7 +27,7 @@ const initialValueFormik = {
   description: "",
 };
 
-const validationSchemaYup = object().shape({
+const FORM_VALIDATION = object().shape({
   netWorth: mixed().when("millionaire", {
     is: true,
     then: number()
@@ -44,7 +47,7 @@ export const App: FC = () => {
         <Card>
           <CardContent>
             <FormikStepper
-              initialValues={initialValueFormik}
+              initialValues={{ ...INITIAL_FORM_STATE }}
               onSubmit={async (values) => {
                 await sleep(3000);
                 console.log(values);
@@ -78,7 +81,7 @@ export const App: FC = () => {
               </FormikStep>
 
               <FormikStep
-                validationSchema={validationSchemaYup}
+                validationSchema={FORM_VALIDATION}
                 label="Bank Accounts"
               >
                 <Box paddingBottom={2}>
